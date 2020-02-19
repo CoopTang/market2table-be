@@ -12,5 +12,12 @@ describe('Test ', () => {
   });
 
   test('It should get a json response with the details of a specific market', async () => {
+    let response = await farmersMarketService.getMarketDetails(1012335)
+
+    expect(response).toHaveProperty('marketdetails')
+    expect(response.marketdetails).toHaveProperty('Address')
+    expect(response.marketdetails).toHaveProperty('GoogleLink')
+    expect(response.marketdetails).toHaveProperty('Products')
+    expect(response.marketdetails).toHaveProperty('Schedule')
   });
 });
