@@ -25,5 +25,16 @@ module.exports = {
     },
     useNullAsDefault: true,
   },
+  travis: {
+    client: 'pg',
+    connection: 'postgres://localhost/travis_ci_test',
+    migrations: {
+      directory: './db/migrations'
+    },
+    seeds: {
+      directory: './db/seeds/dev'
+    },
+    useNullAsDefault: true,
+  }
 
 };
