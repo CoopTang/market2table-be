@@ -1,6 +1,6 @@
 var shell = require('shelljs');
 var request = require("supertest");
-var musixMatchService = require('../../lib/services/farmersMarketService');
+var farmersMarketService = require('../../lib/services/farmersMarketService');
 
 describe('Test ', () => {
   test('It should get a json response with a list of markets from the Farmers Market API', async () => {
