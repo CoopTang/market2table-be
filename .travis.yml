@@ -10,4 +10,4 @@ node_js:
   - 12.14.1 
 
 script:
-  - knex migrate:latest
+  - knex migrate:latest --env test
