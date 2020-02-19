@@ -1,0 +1,13 @@
+services:
+    - postgresql
+
+before_script:
+  - cp config/database.yml.travis config/database.yml
+  - psql -c 'create database travis_ci_test;' -U postgres
+
+language: node_js
+node_js:
+  - 12.14.1 
+
+script:
+  - knex migrate:latest
