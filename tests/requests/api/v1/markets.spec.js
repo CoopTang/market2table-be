@@ -15,7 +15,7 @@ describe('Test The Market\'s Path', () => {
 
     it('should test happy path', async () => {
         let res = await request(app)
-        .get('api/v1/markets?zip=80203')
+        .get('/api/v1/markets?zip=80203')
 
         expect(res.statusCode).toBe(200)
         expect(res.body.length).toBe(19)
