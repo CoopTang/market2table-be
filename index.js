@@ -5,7 +5,7 @@ const graphqlHTTP = require('express-graphql')
 
 
 
-var marketsRouter = require('./lib/routes/api/v1/markets')
+var marketsRouter = require('./lib/routes/api/v1/markets').router
 var graphqlRouter = require('./lib/routes/api/v1/graphql')
 
 app.use(express.json());
