@@ -25,6 +25,16 @@ module.exports = {
     },
     useNullAsDefault: true,
   },
+  production: {
+    client: 'pg',
+    connection: process.env.DATABASE_URL,
+    migrations: {
+      directory: './db/migrations'
+    },
+    seeds: {
+      directory: './db/seeds/dev'
+    }
+  },
   travis: {
     client: 'pg',
     connection: 'postgres://localhost/travis_ci_test',
