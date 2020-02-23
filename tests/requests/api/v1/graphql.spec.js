@@ -158,6 +158,37 @@ describe('Test The Market\'s Path', () => {
       expect(res.body.data.addVendor).toHaveProperty('image_link')
       expect(res.body.data.addVendor.image_link).toBe('https://vendor.com/vendor.jpg')
     })
+
+    describe('sad path', () => {
+      it('query must be a mutation', async () => {
+        const queryString = 'query{markets{id name address google_link schedule latitude longitude}}'
+        let res = await request(app)
+          .post('/api/v1/graphql')
+          .send({
+            query: queryString
+          })
+
+        expect(res.statusCode).toBe(405)
+        expect(res.body).toHaveProperty('message')
+        expect(res.body.message).toBe("Mutation body must start with 'mutation'!")
+      })
+
+      it('query must be free of syntax errors', async () => {
+        const queryString = 'mutation{addVendor(name: "newVendor", description: "vendorDescription", image_link: "https://vendor.com/vendor.jpg"){id'
+        let res = await request(app)
+          .post('/api/v1/graphql')
+          .send({
+            query: queryString
+          })
+
+        expect(res.statusCode).toBe(400)
+        expect(res.body).toHaveProperty('errors')
+        expect(res.body.errors[0]).toHaveProperty('message')
+        expect(res.body.errors[0]).toHaveProperty('locations')
+        expect(res.body.errors[0].locations[0]).toHaveProperty('line')
+        expect(res.body.errors[0].locations[0]).toHaveProperty('column')
+      })
+    })
   })
   
 
