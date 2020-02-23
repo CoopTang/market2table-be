@@ -286,7 +286,7 @@ This endpoint will return a JSON response with the data requested via GraphQL
 This endpoint requires a body with one of the following formats:
 ```json
 {
-  "mutation": "
+  "query": "
     mutation {
       addMarket(
         id: <int>,
@@ -310,7 +310,7 @@ This endpoint requires a body with one of the following formats:
 }
 
 {
-  "mutation": "
+  "query": "
     mutation {
       addVendor(
         name: <string>,
@@ -334,7 +334,7 @@ This endpoint requires a body with one of the following formats:
 }
 
 {
-  "mutation": "
+  "query": "
     mutation {
       addProduct(
         name: <string>,
@@ -358,7 +358,7 @@ This endpoint requires a body with one of the following formats:
 }
 
 {
-  "mutation": "
+  "query": "
     mutation {
       addMarketVendor(
         market_id: <int>,
