@@ -1,17 +1,47 @@
 # Market2Table
-
-# Play
-A back-end api that exposes endpoints for favorite songs added from the Musix Match API
+A back-end API that exposes endpoints to search for farmers markets based on ZIP code as well as their vendor and product details.
 
 ## Tech/framework used
 <b>Built with</b>
 - Express
 - Node.js
 - PostgreSQL
+- GraphQL
 
-Once these are installed, clone the repository to your local machine 
+## Installation
 
 Once cloned onto your computer, `cd` into the project directory and run `npm install ` to install all required packages for the project.
+
+### Database Setup
+
+Create two PostgreSQL databases named `market2table_dev` and `market2table_test` with the following commands:
+
+**MacOS**
+```
+psql
+CREATE DATABASE market2table_dev;
+CREATE DATABASE market2table_test;
+\q
+```
+
+Migrate and seed the database with the following commands:
+```
+knex migrate:latest
+knex seed:run
+```
+---
+
+## Starting Local Server for Development
+To start up the server to test out the API run the following command in a terminal:
+```
+npm start
+```
+If it started correctly, you should see the following output in the terminal
+```
+> y@1.0.0 start <PATH>/market2table-be
+> node ./bin/www
+```
+---
 ## API Reference
 All endpoints require the following headers:
 ```json
@@ -21,7 +51,7 @@ All endpoints require the following headers:
 
 ---
 
-### All Favorites
+### Market Search By Zip
 `GET /api/v1/markets?zip=<ZIP>`
 
 **Successful Response**
@@ -62,7 +92,7 @@ Status code 400
 ---
 
 ### GraphQL Query
-`GET /api/v1/graphql?query=<GRAPHQL QUERY>`
+`GET /api/v1/graphql?query=query{<GRAPHQL QUERY>}`
 
 This endpoint will return a JSON response with the data requested via GraphQL
 
@@ -104,6 +134,15 @@ query {
       description
       price
     }
+    markets {
+      id
+      name
+      address
+      google_link
+      schedule
+      latitude
+      longitude
+  }
   }
 }
 
@@ -118,6 +157,15 @@ query {
       name
       description
       price
+    }
+    markets {
+      id
+      name
+      address
+      google_link
+      schedule
+      latitude
+      longitude
     }
   }
 }
@@ -148,16 +196,26 @@ query {
       name
       description
       image_link
+      markets {
+        id
+        name
+        address
+        google_link
+        schedule
+        latitude
+        longitude
+      }
     }
   }
 }
 ```
 
-Each of the fields can be ommitted if you do not want those fields in the response body.
+Each of the fields can be omitted if you do not want those fields in the response body.
 
 **Successful Response**
 
 Requesting multiple vendors:
+Query: `GET /api/v1/graphql?query=query{vendors{id name}}`
 Status Code: 200
 ```json
 {
@@ -178,6 +236,7 @@ Status Code: 200
 ```
 
 Requesting single vendor:
+Query: `GET /api/v1/graphql?query=query{vendor(id: 1){id name}}`
 Status Code: 200
 ```json
 {
@@ -192,8 +251,30 @@ Status Code: 200
 
 **Unsuccessful Response**
 
+Query does not start with `query`
+Status Code: 405
+```json
+{
+  "message": "Query body must start with 'query'!
+}
 ```
-WIP
+
+Query parameter is missing or an incorrect GraphQL query
+Status Code: 400
+```json
+{
+  "errors": [
+    {
+      "message": "<REASON>",
+      "location": [
+        {
+          "line": <LINE>,
+          "column": <COLUMN>
+        }
+      ]
+    }
+  ]
+}
 ```
 ---
 
@@ -232,7 +313,6 @@ This endpoint requires a body with one of the following formats:
   "mutation": "
     mutation {
       addVendor(
-        id: <int>,
         name: <string>,
         description: <string>,
         image_link: <string>,
@@ -257,7 +337,6 @@ This endpoint requires a body with one of the following formats:
   "mutation": "
     mutation {
       addProduct(
-        id: <int>,
         name: <string>,
         description: <string>,
         price: <float>,
@@ -299,17 +378,72 @@ Each of the fields can be ommitted if you do not want those fields in the respon
 **Successful Response**
 
 Creating a vendor:
+Request Body: 
+```json
+{
+  "mutation": "
+    mutation {
+      addVendor(
+        name: "Bob's Market",
+        description: "I sell Beef",
+        image_link: "http://myimg.me/beef.jpg"
+      ) {
+        id
+        name
+        description
+        image_link
+        products {
+          id
+          name
+          description
+          price
+        }
+      }
+    }
+  "
+}
+```
 Status Code: 201
 ```json
 {
   "data": {
     "addVendor": {
       "id": 1,
-      "name": "vendor_name_1",
-      "description": "description",
-      "image_link": "image_link",
+      "name": "Bob's Market",
+      "description": "I sell Beef",
+      "image_link": "http://myimg.me/beef.jpg",
       "products": []
     }
   }
 }
 ```
+
+**Unsuccessful Response**
+
+Mutation string does not start with `mutation`
+Status Code: 405
+```json
+{
+  "message": "Mutation body must start with 'mutation'!
+}
+```
+
+Query parameter is missing or an incorrect GraphQL query
+Status Code: 400
+```json
+{
+  "errors": [
+    {
+      "message": "<REASON>",
+      "location": [
+        {
+          "line": <LINE>,
+          "column": <COLUMN>
+        }
+      ]
+    }
+  ]
+}
+```
+
+
