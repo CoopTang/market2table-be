@@ -98,43 +98,122 @@ describe('Test The Market\'s Path', () => {
     database.raw('TRUNCATE TABLE vendors CASCADE')
   })
 
-  it('should test happy path', async () => {
-    let res = await request(app)
-      .get('/api/v1/graphql?query=query{markets{id name address google_link schedule latitude longitude}}')
+  describe('GET request', () => {
+    it('should test happy path', async () => {
+      let res = await request(app)
+        .get('/api/v1/graphql?query=query{markets{id name address google_link schedule latitude longitude}}')
+        
+      expect(res.statusCode).toBe(200)
+      expect(res.body).toHaveProperty('data')
+      expect(res.body.data.markets.length).toBe(2)
+      expect(res.body.data.markets[0]).toHaveProperty('id')
+      expect(res.body.data.markets[0].id).toBe("123345")
+      expect(res.body.data.markets[0]).toHaveProperty('name')
+      expect(res.body.data.markets[0].name).toBe("market_1")
+      expect(res.body.data.markets[0]).toHaveProperty('address')
+      expect(res.body.data.markets[0].address).toBe("market_1_address")
+      expect(res.body.data.markets[0]).toHaveProperty('google_link')
+      expect(res.body.data.markets[0].google_link).toBe("market_1_google_link")
+      expect(res.body.data.markets[0]).toHaveProperty('schedule')
+      expect(res.body.data.markets[0].schedule).toBe("market_1_schedule")
+      expect(res.body.data.markets[0]).toHaveProperty('latitude')
+      expect(res.body.data.markets[0].latitude).toBe(0.99)
+      expect(res.body.data.markets[0]).toHaveProperty('longitude')
+      expect(res.body.data.markets[0].longitude).toBe(0.99)
       
-    expect(res.statusCode).toBe(200)
-    expect(res.body).toHaveProperty('data')
-    expect(res.body.data.markets.length).toBe(2)
-    expect(res.body.data.markets[0]).toHaveProperty('id')
-    expect(res.body.data.markets[0].id).toBe("123345")
-    expect(res.body.data.markets[0]).toHaveProperty('name')
-    expect(res.body.data.markets[0].name).toBe("market_1")
-    expect(res.body.data.markets[0]).toHaveProperty('address')
-    expect(res.body.data.markets[0].address).toBe("market_1_address")
-    expect(res.body.data.markets[0]).toHaveProperty('google_link')
-    expect(res.body.data.markets[0].google_link).toBe("market_1_google_link")
-    expect(res.body.data.markets[0]).toHaveProperty('schedule')
-    expect(res.body.data.markets[0].schedule).toBe("market_1_schedule")
-    expect(res.body.data.markets[0]).toHaveProperty('latitude')
-    expect(res.body.data.markets[0].latitude).toBe(0.99)
-    expect(res.body.data.markets[0]).toHaveProperty('longitude')
-    expect(res.body.data.markets[0].longitude).toBe(0.99)
-    
-    expect(res.body.data.markets[1]).toHaveProperty('id')
-    expect(res.body.data.markets[1].id).toBe("67890")
-    expect(res.body.data.markets[1]).toHaveProperty('name')
-    expect(res.body.data.markets[1].name).toBe("market_2")
-    expect(res.body.data.markets[1]).toHaveProperty('address')
-    expect(res.body.data.markets[1].address).toBe("market_2_address")
-    expect(res.body.data.markets[1]).toHaveProperty('google_link')
-    expect(res.body.data.markets[1].google_link).toBe("market_2_google_link")
-    expect(res.body.data.markets[1]).toHaveProperty('schedule')
-    expect(res.body.data.markets[1].schedule).toBe("market_2_schedule")
-    expect(res.body.data.markets[1]).toHaveProperty('latitude')
-    expect(res.body.data.markets[1].latitude).toBe(0.99)
-    expect(res.body.data.markets[1]).toHaveProperty('longitude')
-    expect(res.body.data.markets[1].longitude).toBe(0.99)
+      expect(res.body.data.markets[1]).toHaveProperty('id')
+      expect(res.body.data.markets[1].id).toBe("67890")
+      expect(res.body.data.markets[1]).toHaveProperty('name')
+      expect(res.body.data.markets[1].name).toBe("market_2")
+      expect(res.body.data.markets[1]).toHaveProperty('address')
+      expect(res.body.data.markets[1].address).toBe("market_2_address")
+      expect(res.body.data.markets[1]).toHaveProperty('google_link')
+      expect(res.body.data.markets[1].google_link).toBe("market_2_google_link")
+      expect(res.body.data.markets[1]).toHaveProperty('schedule')
+      expect(res.body.data.markets[1].schedule).toBe("market_2_schedule")
+      expect(res.body.data.markets[1]).toHaveProperty('latitude')
+      expect(res.body.data.markets[1].latitude).toBe(0.99)
+      expect(res.body.data.markets[1]).toHaveProperty('longitude')
+      expect(res.body.data.markets[1].longitude).toBe(0.99)
+    })
+
+    describe('sad path', () => {
+      it('query must be a query', async () => {
+        let res = await request(app)
+          .get('/api/v1/graphql?query=mutation{addVendor(name: "newVendor", description: "vendorDescription", image_link: "https://vendor.com/vendor.jpg"){id}}')
+
+        expect(res.statusCode).toBe(405)
+        expect(res.body).toHaveProperty('message')
+        expect(res.body.message).toBe("Mutation body must start with 'query'!")
+      })
+
+      it('query must be free of syntax errors', async () => {
+        let res = await request(app)
+          .get('/api/v1/graphql?query=query{vendors{invalid syntax}}')
+
+        expect(res.statusCode).toBe(400)
+        expect(res.body).toHaveProperty('errors')
+        expect(res.body.errors[0]).toHaveProperty('message')
+        expect(res.body.errors[0]).toHaveProperty('locations')
+        expect(res.body.errors[0].locations[0]).toHaveProperty('line')
+        expect(res.body.errors[0].locations[0]).toHaveProperty('column')
+      })
+    })
   })
+
+  describe('POST request', () => {
+    it('happy path', async () => {
+      const queryString = 'mutation{addVendor(name: "newVendor", description: "vendorDescription", image_link: "https://vendor.com/vendor.jpg"){id name description image_link}}'
+      let res = await request(app)
+        .post('/api/v1/graphql')
+        .send({
+          query: queryString
+        })
+
+      expect(res.statusCode).toBe(201)
+      expect(res.body).toHaveProperty('data')
+      expect(res.body.data).toHaveProperty('addVendor')
+      expect(res.body.data.addVendor).toHaveProperty('id')
+      expect(res.body.data.addVendor).toHaveProperty('name')
+      expect(res.body.data.addVendor.name).toBe('newVendor')
+      expect(res.body.data.addVendor).toHaveProperty('description')
+      expect(res.body.data.addVendor.description).toBe('vendorDescription')
+      expect(res.body.data.addVendor).toHaveProperty('image_link')
+      expect(res.body.data.addVendor.image_link).toBe('https://vendor.com/vendor.jpg')
+    })
+
+    describe('sad path', () => {
+      it('query must be a mutation', async () => {
+        const queryString = 'query{markets{id name address google_link schedule latitude longitude}}'
+        let res = await request(app)
+          .post('/api/v1/graphql')
+          .send({
+            query: queryString
+          })
+
+        expect(res.statusCode).toBe(405)
+        expect(res.body).toHaveProperty('message')
+        expect(res.body.message).toBe("Mutation body must start with 'mutation'!")
+      })
+
+      it('query must be free of syntax errors', async () => {
+        const queryString = 'mutation{addVendor(name: "newVendor", description: "vendorDescription", image_link: "https://vendor.com/vendor.jpg"){id'
+        let res = await request(app)
+          .post('/api/v1/graphql')
+          .send({
+            query: queryString
+          })
+
+        expect(res.statusCode).toBe(400)
+        expect(res.body).toHaveProperty('errors')
+        expect(res.body.errors[0]).toHaveProperty('message')
+        expect(res.body.errors[0]).toHaveProperty('locations')
+        expect(res.body.errors[0].locations[0]).toHaveProperty('line')
+        expect(res.body.errors[0].locations[0]).toHaveProperty('column')
+      })
+    })
+  })
+  
 
   describe('GraphQL Query tests', () => {
     it('should get all markets', async () => {
