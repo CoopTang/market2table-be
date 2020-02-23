@@ -140,7 +140,7 @@ describe('Test The Market\'s Path', () => {
 
   describe('POST request', () => {
     it('happy path', async () => {
-      const queryString = 'mutation{addVendor(name: "newVendor, description: "vendorDescription", image_link: "https://vendor.com/vendor.jpg"){id name description image_link}}'
+      const queryString = 'mutation{addVendor(name: "newVendor", description: "vendorDescription", image_link: "https://vendor.com/vendor.jpg"){id name description image_link}}'
       let res = await request(app)
         .post('/api/v1/graphql')
         .send({
