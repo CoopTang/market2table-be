@@ -136,6 +136,29 @@ describe('Test The Market\'s Path', () => {
       expect(res.body.data.markets[1]).toHaveProperty('longitude')
       expect(res.body.data.markets[1].longitude).toBe(0.99)
     })
+
+    describe('sad path', () => {
+      it('query must be a query', async () => {
+        let res = await request(app)
+          .get('/api/v1/graphql?query=mutation{addVendor(name: "newVendor", description: "vendorDescription", image_link: "https://vendor.com/vendor.jpg"){id}}')
+
+        expect(res.statusCode).toBe(405)
+        expect(res.body).toHaveProperty('message')
+        expect(res.body.message).toBe("Mutation body must start with 'query'!")
+      })
+
+      it('query must be free of syntax errors', async () => {
+        let res = await request(app)
+          .get('/api/v1/graphql?query=query{vendors{invalid syntax}}')
+
+        expect(res.statusCode).toBe(400)
+        expect(res.body).toHaveProperty('errors')
+        expect(res.body.errors[0]).toHaveProperty('message')
+        expect(res.body.errors[0]).toHaveProperty('locations')
+        expect(res.body.errors[0].locations[0]).toHaveProperty('line')
+        expect(res.body.errors[0].locations[0]).toHaveProperty('column')
+      })
+    })
   })
 
   describe('POST request', () => {
