@@ -210,7 +210,7 @@ query {
 }
 ```
 
-Each of the fields can be ommitted if you do not want those fields in the response body.
+Each of the fields can be omitted if you do not want those fields in the response body.
 
 **Successful Response**
 
