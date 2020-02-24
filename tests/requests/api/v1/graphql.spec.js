@@ -196,6 +196,29 @@ describe('Test The Market\'s Path', () => {
         expect(res.body.message).toBe("Mutation body must start with 'mutation'!")
       })
 
+      it('query strips leading whitespace', async () => {
+        let name = "newVendor"
+        let description = "vendorDescription"
+        let image = "https://vendor.com/vendor.jpg"
+        let res = await request(app)
+          .post('/api/v1/graphql')
+          .send({
+            query: ` 
+              mutation {
+                addVendor(
+                  name: "${name}",
+                  description: "${description}",
+                  image_link: "${image}"
+                ) {
+                  id
+                }
+              }
+            `
+          })
+
+        expect(res.statusCode).toBe(201)
+      })
+
       it('query must be free of syntax errors', async () => {
         const queryString = 'mutation{addVendor(name: "newVendor", description: "vendorDescription", image_link: "https://vendor.com/vendor.jpg"){id'
         let res = await request(app)
