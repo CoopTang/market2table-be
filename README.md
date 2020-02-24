@@ -312,6 +312,14 @@ This endpoint requires a body with one of the following formats:
 {
   "query": "
     mutation {
+      deleteMarket(id: <int>)
+    }
+  "
+}
+
+{
+  "query": "
+    mutation {
       addVendor(
         name: <string>,
         description: <string>,
@@ -329,6 +337,14 @@ This endpoint requires a body with one of the following formats:
           price
         }
       }
+    }
+  "
+}
+
+{
+  "query": "
+    mutation {
+      deleteVendor(id: <int>)
     }
   "
 }
@@ -360,6 +376,14 @@ This endpoint requires a body with one of the following formats:
 {
   "query": "
     mutation {
+      deleteProduct(id: <int>)
+    }
+  "
+}
+
+{
+  "query": "
+    mutation {
       addMarketVendor(
         market_id: <int>,
         vendor_id: <int>
@@ -368,6 +392,22 @@ This endpoint requires a body with one of the following formats:
         market
         vendor
       }
+    }
+  "
+}
+
+{
+  "query": "
+    mutation {
+      deleteMarketVendor(id: <int>)
+    }
+  "
+}
+
+{
+  "query": "
+    mutation {
+      deleteAllVendorProducts(id: <int>)
     }
   "
 }
