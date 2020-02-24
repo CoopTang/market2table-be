@@ -312,7 +312,7 @@ This endpoint requires a body with one of the following formats:
 {
   "query": "
     mutation {
-      deleteMarket(id: <int>)
+      deleteMarket(id: <market_id>)
     }
   "
 }
@@ -344,7 +344,7 @@ This endpoint requires a body with one of the following formats:
 {
   "query": "
     mutation {
-      deleteVendor(id: <int>)
+      deleteVendor(id: <vendor_id>)
     }
   "
 }
@@ -376,7 +376,7 @@ This endpoint requires a body with one of the following formats:
 {
   "query": "
     mutation {
-      deleteProduct(id: <int>)
+      deleteProduct(id: <product_id>)
     }
   "
 }
@@ -399,7 +399,7 @@ This endpoint requires a body with one of the following formats:
 {
   "query": "
     mutation {
-      deleteMarketVendor(id: <int>)
+      deleteMarketVendor(id: <market_vendor_id>)
     }
   "
 }
@@ -407,7 +407,7 @@ This endpoint requires a body with one of the following formats:
 {
   "query": "
     mutation {
-      deleteAllVendorProducts(id: <int>)
+      deleteAllVendorProducts(id: <vendor_id>)
     }
   "
 }
