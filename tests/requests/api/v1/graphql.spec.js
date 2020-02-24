@@ -308,7 +308,7 @@ describe('Test The Market\'s Path', () => {
 
     it('should get all vendors', async () => {
       let res = await request(app)
-        .get('/api/v1/graphql?query=query{vendors{id name description image_link products { id }}}')
+        .get('/api/v1/graphql?query=query{vendors{id name description image_link products { id } markets { id } }}')
         
       expect(res.statusCode).toBe(200)
       expect(res.body).toHaveProperty('data')
@@ -322,6 +322,10 @@ describe('Test The Market\'s Path', () => {
       expect(res.body.data.vendors[0].image_link).toBe("vendor_1_image_link")
       expect(res.body.data.vendors[0]).toHaveProperty('products')
       expect(res.body.data.vendors[0].products.length).toBe(2)
+      expect(res.body.data.vendors[0]).toHaveProperty('markets')
+      expect(res.body.data.vendors[0].markets.length).toBe(2)
+
+
       
       expect(res.body.data.vendors[1]).toHaveProperty('id')
       expect(res.body.data.vendors[1]).toHaveProperty('name')
@@ -332,12 +336,14 @@ describe('Test The Market\'s Path', () => {
       expect(res.body.data.vendors[1].image_link).toBe("vendor_2_image_link")
       expect(res.body.data.vendors[1]).toHaveProperty('products')
       expect(res.body.data.vendors[1].products.length).toBe(3)
+      expect(res.body.data.vendors[1]).toHaveProperty('markets')
+      expect(res.body.data.vendors[1].markets.length).toBe(1)
     })
 
     it('should get a single vendor by id', async () => {
       const vendor = await database('vendors').select().first()
       let res = await request(app)
-        .get(`/api/v1/graphql?query=query{vendor(id: ${vendor.id}){id name description image_link products { id }}}`)
+        .get(`/api/v1/graphql?query=query{vendor(id: ${vendor.id}){id name description image_link products { id } markets { id } }}`)
         
       expect(res.statusCode).toBe(200)
       expect(res.body).toHaveProperty('data')
@@ -350,6 +356,8 @@ describe('Test The Market\'s Path', () => {
       expect(res.body.data.vendor.image_link).toBe("vendor_1_image_link")
       expect(res.body.data.vendor).toHaveProperty('products')
       expect(res.body.data.vendor.products.length).toBe(2)
+      expect(res.body.data.vendor).toHaveProperty('markets')
+      expect(res.body.data.vendor.markets.length).toBe(2)
     })
 
     it('should get all products', async () => {
