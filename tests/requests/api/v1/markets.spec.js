@@ -30,6 +30,26 @@ describe('Test The Market\'s Path', () => {
     expect(res.body[0]).toHaveProperty('longitude')
   })
 
+  describe('should test sad path', () => {
+    it('zip should be a number', async () => {
+      let res = await request(app)
+        .get('/api/v1/markets?zip=asdf')
+
+      expect(res.statusCode).toBe(404)
+      expect(res.body).toHaveProperty('message')
+      expect(res.body.message).toBe("That zip code does not exist!")
+    })
+
+    it('zip should be only five numbers', async () => {
+      let res = await request(app)
+        .get('/api/v1/markets?zip=8000')
+
+      expect(res.statusCode).toBe(400)
+      expect(res.body).toHaveProperty('message')
+      expect(res.body.message).toBe("Invalid zip format!")
+    })
+  })
+
   it('should update or create markets', async () => {
     await database('markets').insert({
       id: 1,
