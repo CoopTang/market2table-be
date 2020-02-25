@@ -436,4 +436,26 @@ describe('Test The Market\'s Path', () => {
       expect(res.body.data.product.vendor).toHaveProperty('id')
     })
   })
+
+  describe('GraphQL Query tests', () => {
+    it('should delete all products for a vendor', async () => {
+      const vendor = await database('vendors').select().first()
+      const queryString = `mutation{deleteAllVendorProducts(id: ${vendor.id})}`
+      let res = await request(app)
+        .post('/api/v1/graphql')
+        .send({
+          query: queryString
+        })
+      const vendor_products = await database('products').where('vendor_id', vendor.id).select()
+      const products = await database('products').select()
+
+      expect(res.statusCode).toBe(201)
+      expect(res.body).toHaveProperty('data')
+      expect(res.body.data).toHaveProperty('deleteAllVendorProducts')
+      expect(res.body.data.deleteAllVendorProducts).toBe('Success!')
+
+      expect(vendor_products.length).toBe(0)
+      expect(products.length).toBe(3)
+    })
+  })
 })
