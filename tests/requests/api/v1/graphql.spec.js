@@ -465,6 +465,25 @@ describe('Test The Market\'s Path', () => {
           expect(markets.length).toBe(3)
         })
       });
+      describe('deleteMarket', () => {
+        it('should delete the specified market', async () => {
+          const market = await database('markets').select().first()
+          const url = `/api/v1/graphql`
+          let res = await request(app)
+          .post(url)
+          .send({ query: `mutation { deleteMarket( id: ${market.id})}`})
+
+          const selectedMarket = await database('markets').where('id', market.id).select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('deleteMarket')
+          expect(res.body.data.deleteMarket).toBe('Success!')
+
+          expect(selectedMarket.length).toBe(0)
+      
+        });
+      })
       describe('deleteAllVendorProducts', () => {
         it('should delete all products for a vendor', async () => {
           const vendor = await database('vendors').select().first()
