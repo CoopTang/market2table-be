@@ -484,22 +484,34 @@ describe('Test The Market\'s Path', () => {
       
         });
       });
-      // describe('addMarketVendor', () => {
-      //   it.skip('should return the info for the newly added market vendor', async () => {
-      //     const url = `/api/v1/graphql`
-      //     let res = await request(app)
-      //     .post(url)
-      //     .send({ query: 'mutation { addMarketVendor( market_id: 4, vendor_id: 5) { market_id, vendor_id}}'})
-      //     const marketVendor = await database('market_vendors').select()
+      describe('addMarketVendor', () => {
+        it('should return the info for the newly added market vendor', async () => {
+          const url = `/api/v1/graphql`
+          const market = await database('markets').first()
+          const vendor = await database('vendors').first()
+          let res = await request(app)
+          .post(url)
+          .send({ query: `mutation { addMarketVendor( market_id: ${market.id}, vendor_id: ${vendor.id} ) { id market { id } vendor { id } }}`})
+          const marketVendor = await database('market_vendors').select()
 
-      //     expect(res.statusCode).toBe(201)
-      //   });
-      // });
-      // describe('deleteMarketVendor', () => {
-      //   it.skip('should delete a market vendor', async () => {
+          expect(marketVendor.length).toBe(4)
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('addMarketVendor')
+          expect(res.body.data.addMarketVendor).toHaveProperty('id')
+          expect(res.body.data.addMarketVendor.id).toBe(`${marketVendor[3].id}`)
+          expect(res.body.data.addMarketVendor).toHaveProperty('market')
+          expect(res.body.data.addMarketVendor.market.id).toBe(`${market.id}`)
+          expect(res.body.data.addMarketVendor).toHaveProperty('vendor')
+          expect(res.body.data.addMarketVendor.vendor.id).toBe(`${vendor.id}`)
+          
+        });
+      });
+      describe('deleteMarketVendor', () => {
+        it.skip('should delete a market vendor', async () => {
 
-      //   });
-      // });
+        });
+      });
       describe('addProduct', () => {
         it.skip('should return the information for the newly added product', async () => {
           const url = `/api/v1/graphql`
