@@ -439,7 +439,7 @@ describe('Test The Market\'s Path', () => {
   describe('GraphQL Query tests', () => {
     describe('MUTATIONS', () => {
       describe('addMarkets', () => {
-        it('should return the info for the newly added market', async () => {
+        it('should return the information for the newly added market', async () => {
           const url = `/api/v1/graphql`
           let res = await request(app)
           .post(url)
@@ -483,6 +483,46 @@ describe('Test The Market\'s Path', () => {
           expect(selectedMarket.length).toBe(0)
       
         });
+      });
+      // describe('addMarketVendor', () => {
+      //   it.skip('should return the info for the newly added market vendor', async () => {
+      //     const url = `/api/v1/graphql`
+      //     let res = await request(app)
+      //     .post(url)
+      //     .send({ query: 'mutation { addMarketVendor( market_id: 4, vendor_id: 5) { market_id, vendor_id}}'})
+      //     const marketVendor = await database('market_vendors').select()
+
+      //     expect(res.statusCode).toBe(201)
+      //   });
+      // });
+      // describe('deleteMarketVendor', () => {
+      //   it.skip('should delete a market vendor', async () => {
+
+      //   });
+      // });
+      describe('addProduct', () => {
+        it.skip('should return the information for the newly added product', async () => {
+          const url = `/api/v1/graphql`
+          let res = await request(app)
+          .post(url)
+          .send({ query: 'mutation { addProduct(id: 901, name: "mochi", description: "rice cake", price: 99.99, vendor_id: 2) {id name description price vendor_id}}'})
+          const product = await database('products').select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data.addProduct).toHaveProperty('id')
+          expect(res.body.data.addProduct.id).toBe("901")
+          expect(res.body.data.addProduct).toHaveProperty('name')
+          expect(res.body.data.addProduct.name).toBe("mochi")
+          expect(res.body.data.addProduct).toHaveProperty('description')
+          expect(res.body.data.addProduct.description).toBe("rice cake")
+          expect(res.body.data.addProduct).toHaveProperty('price')
+          expect(res.body.data.addProduct.price).toBe(99.99)
+          expect(res.body.data.addProduct).toHaveProperty('vendor_id')
+          expect(res.body.data.addProduct.vendor_id).toBe(2)
+          expect(product.length).toBe(3)
+
+        })
       })
       describe('deleteAllVendorProducts', () => {
         it('should delete all products for a vendor', async () => {
