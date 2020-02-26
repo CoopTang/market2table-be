@@ -438,7 +438,7 @@ describe('Test The Market\'s Path', () => {
   })
   describe('GraphQL Query tests', () => {
     describe('MUTATIONS', () => {
-      describe('addMarkets', () => {
+      describe('addMarket', () => {
         it('should return the information for the newly added market', async () => {
           const url = `/api/v1/graphql`
           let res = await request(app)
@@ -484,46 +484,122 @@ describe('Test The Market\'s Path', () => {
       
         });
       });
-      // describe('addMarketVendor', () => {
-      //   it.skip('should return the info for the newly added market vendor', async () => {
-      //     const url = `/api/v1/graphql`
-      //     let res = await request(app)
-      //     .post(url)
-      //     .send({ query: 'mutation { addMarketVendor( market_id: 4, vendor_id: 5) { market_id, vendor_id}}'})
-      //     const marketVendor = await database('market_vendors').select()
-
-      //     expect(res.statusCode).toBe(201)
-      //   });
-      // });
-      // describe('deleteMarketVendor', () => {
-      //   it.skip('should delete a market vendor', async () => {
-
-      //   });
-      // });
-      describe('addProduct', () => {
-        it.skip('should return the information for the newly added product', async () => {
+      describe('addVendor', () => {
+        it('should return the information for a new vendor', async () => {
           const url = `/api/v1/graphql`
           let res = await request(app)
           .post(url)
-          .send({ query: 'mutation { addProduct(id: 901, name: "mochi", description: "rice cake", price: 99.99, vendor_id: 2) {id name description price vendor_id}}'})
-          const product = await database('products').select()
+          .send({ query: 'mutation { addVendor(name: "Michael\'s Vendor", description: "Big Tomatoes", image_link: "n/a"){name description image_link}}'})
+          const vendors = await database('vendors').select()
 
           expect(res.statusCode).toBe(201)
           expect(res.body).toHaveProperty('data')
-          expect(res.body.data.addProduct).toHaveProperty('id')
-          expect(res.body.data.addProduct.id).toBe("901")
+          expect(res.body.data).toHaveProperty('addVendor')
+          expect(res.body.data.addVendor).toHaveProperty('name')
+          expect(res.body.data.addVendor.name).toBe("Michael\'s Vendor")
+          expect(res.body.data.addVendor).toHaveProperty('description')
+          expect(res.body.data.addVendor.description).toBe("Big Tomatoes")
+          expect(res.body.data.addVendor).toHaveProperty('image_link')
+          expect(res.body.data.addVendor.image_link).toBe("n/a")
+          expect(vendors.length).toBe(3)
+        })
+      });
+      describe('deleteVendor', () => {
+        it('should delete the specified vendor', async () => {
+          const vendor = await database('vendors').select().first()
+          const url = `/api/v1/graphql`
+          const res = await request(app)
+          .post(url)
+          .send({ query: `mutation { deleteVendor( id: ${vendor.id}) }`})
+          const selectedVendor = await database('vendors').where('id', vendor.id).select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('deleteVendor')
+          expect(res.body.data.deleteVendor).toBe('Success!')
+          expect(selectedVendor.length).toBe(0)
+        })
+      });
+      describe('addMarketVendor', () => {
+        it('should return the info for the newly added market vendor', async () => {
+          const url = `/api/v1/graphql`
+          const market = await database('markets').first()
+          const vendor = await database('vendors').first()
+          let res = await request(app)
+          .post(url)
+          .send({ query: `mutation { addMarketVendor( market_id: ${market.id}, vendor_id: ${vendor.id} ) { id market { id } vendor { id } }}`})
+          const marketVendor = await database('market_vendors').select()
+
+          expect(marketVendor.length).toBe(4)
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('addMarketVendor')
+          expect(res.body.data.addMarketVendor).toHaveProperty('id')
+          expect(res.body.data.addMarketVendor.id).toBe(`${marketVendor[3].id}`)
+          expect(res.body.data.addMarketVendor).toHaveProperty('market')
+          expect(res.body.data.addMarketVendor.market.id).toBe(`${market.id}`)
+          expect(res.body.data.addMarketVendor).toHaveProperty('vendor')
+          expect(res.body.data.addMarketVendor.vendor.id).toBe(`${vendor.id}`)
+          
+        });
+      });
+      describe('deleteMarketVendor', () => {
+        it('should delete a market vendor', async () => {
+          let marketVendor = await database('market_vendors').select().first()
+          const url = `/api/v1/graphql`
+          let res = await request(app)
+          .post(url)
+          .send({ query: `mutation { deleteMarketVendor( id: ${marketVendor.id} )}`})
+          const selectedMarketVendor = await database('market_vendors').where('id', marketVendor.id).select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('deleteMarketVendor')
+          expect(res.body.data.deleteMarketVendor).toBe('Success!')
+          expect(selectedMarketVendor.length).toBe(0)
+          
+        });
+      });
+      describe('addProduct', () => {
+        it('should return the information for the newly added product', async () => {
+          const url = `/api/v1/graphql`
+          const vendor = await database('vendors').first()
+          let res = await request(app)
+          .post(url)
+          .send({ query: `mutation { addProduct(name: "mochi", description: "rice cake", price: 99.99, vendor_id: ${vendor.id}) {name description price vendor {id}}}`})
+          const product = await database('products').select()
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('addProduct')
           expect(res.body.data.addProduct).toHaveProperty('name')
           expect(res.body.data.addProduct.name).toBe("mochi")
           expect(res.body.data.addProduct).toHaveProperty('description')
           expect(res.body.data.addProduct.description).toBe("rice cake")
           expect(res.body.data.addProduct).toHaveProperty('price')
           expect(res.body.data.addProduct.price).toBe(99.99)
-          expect(res.body.data.addProduct).toHaveProperty('vendor_id')
-          expect(res.body.data.addProduct.vendor_id).toBe(2)
-          expect(product.length).toBe(3)
+          expect(res.body.data.addProduct).toHaveProperty('vendor')
+          expect(res.body.data.addProduct.vendor.id).toBe(`${vendor.id}`)
+          expect(product.length).toBe(6)
 
-        })
-      })
+        });
+      });
+      describe('deleteProduct', () => {
+        it('should delete the specified product', async () => {
+          const product = await database('products').select().first()
+          const url = `/api/v1/graphql`
+          const res = await request(app)
+          .post(url)
+          .send({ query: `mutation { deleteProduct(id: ${product.id})}`})
+
+          const selectedProduct = await database('products').where('id', product.id).select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('deleteProduct')
+          expect(res.body.data.deleteProduct).toBe('Success!')
+          expect(selectedProduct.length).toBe(0)
+        });
+      });
       describe('deleteAllVendorProducts', () => {
         it('should delete all products for a vendor', async () => {
           const vendor = await database('vendors').select().first()
@@ -545,8 +621,51 @@ describe('Test The Market\'s Path', () => {
           expect(products.length).toBe(3)
         });
       });
-      
+      describe('updateVendor', () => {
+        it('should update the information of the specified vendor', async () => {
+          const vendor = await database('vendors').select().first()
+          const url = `/api/v1/graphql`
+          const res = await request(app)
+          .post(url)
+          .send({query: `mutation {updateVendor(id: ${vendor.id}, name: "Foster", description: "fresh fruits", image_link: "n/a") {id name description image_link}}`})
+          const vendors = await database('vendors').select()
 
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('updateVendor')
+          expect(res.body.data.updateVendor).toHaveProperty('id')
+          expect(res.body.data.updateVendor.id).toBe(`${vendor.id}`)
+          expect(res.body.data.updateVendor).toHaveProperty('name')
+          expect(res.body.data.updateVendor.name).toBe("Foster")
+          expect(res.body.data.updateVendor).toHaveProperty('description')
+          expect(res.body.data.updateVendor.description).toBe("fresh fruits")
+          expect(res.body.data.updateVendor).toHaveProperty('image_link')
+          expect(res.body.data.updateVendor.image_link).toBe("n/a")
+          expect(vendors.length).toBe(2)
+
+        });
+        it('should update a single field', async () => {
+          const vendor = await database('vendors').select().first()
+          const url = `/api/v1/graphql`
+          const res = await request(app)
+          .post(url)
+          .send({query: `mutation {updateVendor(id: ${vendor.id}, name: "Foster") {id name description image_link}}`})
+          const vendors = await database('vendors').select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('updateVendor')
+          expect(res.body.data.updateVendor).toHaveProperty('id')
+          expect(res.body.data.updateVendor.id).toBe(`${vendor.id}`)
+          expect(res.body.data.updateVendor).toHaveProperty('name')
+          expect(res.body.data.updateVendor.name).toBe("Foster")
+          expect(res.body.data.updateVendor).toHaveProperty('description')
+          expect(res.body.data.updateVendor.description).toBe("vendor_1_description")
+          expect(res.body.data.updateVendor).toHaveProperty('image_link')
+          expect(res.body.data.updateVendor.image_link).toBe("vendor_1_image_link")
+          expect(vendors.length).toBe(2)
+        })
+      });
     })
   })
 })
