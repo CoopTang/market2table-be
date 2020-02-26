@@ -622,12 +622,50 @@ describe('Test The Market\'s Path', () => {
         });
       });
       describe('updateVendor', () => {
-        it.skip('should update the information of the specified vendor', async () => {
+        it('should update the information of the specified vendor', async () => {
+          const vendor = await database('vendors').select().first()
+          const url = `/api/v1/graphql`
+          const res = await request(app)
+          .post(url)
+          .send({query: `mutation {updateVendor(id: ${vendor.id}, name: "Foster", description: "fresh fruits", image_link: "n/a") {id name description image_link}}`})
+          const vendors = await database('vendors').select()
 
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('updateVendor')
+          expect(res.body.data.updateVendor).toHaveProperty('id')
+          expect(res.body.data.updateVendor.id).toBe(`${vendor.id}`)
+          expect(res.body.data.updateVendor).toHaveProperty('name')
+          expect(res.body.data.updateVendor.name).toBe("Foster")
+          expect(res.body.data.updateVendor).toHaveProperty('description')
+          expect(res.body.data.updateVendor.description).toBe("fresh fruits")
+          expect(res.body.data.updateVendor).toHaveProperty('image_link')
+          expect(res.body.data.updateVendor.image_link).toBe("n/a")
+          expect(vendors.length).toBe(2)
+
+        });
+        it('should update a single field', async () => {
+          const vendor = await database('vendors').select().first()
+          const url = `/api/v1/graphql`
+          const res = await request(app)
+          .post(url)
+          .send({query: `mutation {updateVendor(id: ${vendor.id}, name: "Foster") {id name description image_link}}`})
+          const vendors = await database('vendors').select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('updateVendor')
+          expect(res.body.data.updateVendor).toHaveProperty('id')
+          expect(res.body.data.updateVendor.id).toBe(`${vendor.id}`)
+          expect(res.body.data.updateVendor).toHaveProperty('name')
+          expect(res.body.data.updateVendor.name).toBe("Foster")
+          expect(res.body.data.updateVendor).toHaveProperty('description')
+          expect(res.body.data.updateVendor.description).toBe("vendor_1_description")
+          expect(res.body.data.updateVendor).toHaveProperty('image_link')
+          expect(res.body.data.updateVendor.image_link).toBe("vendor_1_image_link")
+          expect(vendors.length).toBe(2)
         })
-      })
-      
-
+      });
     })
   })
 })
