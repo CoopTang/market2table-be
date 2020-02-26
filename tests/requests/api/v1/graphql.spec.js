@@ -438,7 +438,7 @@ describe('Test The Market\'s Path', () => {
   })
   describe('GraphQL Query tests', () => {
     describe('MUTATIONS', () => {
-      describe('addMarkets', () => {
+      describe('addMarket', () => {
         it('should return the information for the newly added market', async () => {
           const url = `/api/v1/graphql`
           let res = await request(app)
@@ -483,6 +483,32 @@ describe('Test The Market\'s Path', () => {
           expect(selectedMarket.length).toBe(0)
       
         });
+      });
+      describe('addVendor', () => {
+        it('should return the information for a new vendor', async () => {
+          const url = `/api/v1/graphql`
+          let res = await request(app)
+          .post(url)
+          .send({ query: 'mutation { addVendor(id: 888, name: "Michael\'s Vendor", description: "Big Tomatoes", image_link: "n/a"){id name description image_link}}'})
+          const vendors = await database('vendors').select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data.addVendor).toHaveProperty('id')
+          expect(res.body.data.addVendor.id).toBe("888")
+          expect(res.body.data.addVendor).toHaveProperty('name')
+          expect(res.body.data.addVendor.name).toBe("Michael\'s Vendor")
+          expect(res.body.data.addVendor).toHaveProperty('description')
+          expect(res.body.data.addVendor.description).toBe("Big Tomatoes")
+          expect(res.body.data.addVendor).toHaveProperty('image_link')
+          expect(res.body.data.addVendor.image_link).toBe("n/a")
+          expect(vendors.length).toBe(3)
+        })
+      });
+      describe('deleteVendor', () => {
+        it.skip('should', async () => {
+
+        })
       });
       describe('addMarketVendor', () => {
         it('should return the info for the newly added market vendor', async () => {
