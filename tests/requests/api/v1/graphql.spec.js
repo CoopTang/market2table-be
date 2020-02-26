@@ -507,7 +507,6 @@ describe('Test The Market\'s Path', () => {
       describe('deleteVendor', () => {
         it('should delete the specified vendor', async () => {
           const vendor = await database('vendors').select().first()
-          // const market_vendors = await database('market-vendors').select().first()
           const url = `/api/v1/graphql`
           const res = await request(app)
           .post(url)
