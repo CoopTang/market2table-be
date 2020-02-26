@@ -76,6 +76,7 @@ Status 200
 
 **Unsuccessful response**
 If the zip code is the proper format, but there is no zip code with the given zip
+
 Status code 404
 ```
 {
@@ -85,6 +86,7 @@ Status code 404
 
 
 If the zip code is formatted incorrectly (i.e. not five numbers or has non-numeric character)
+
 Status code 400
 ```
 {
@@ -218,8 +220,11 @@ Each of the fields can be omitted if you do not want those fields in the respons
 **Successful Response**
 
 Requesting multiple vendors:
+
 Query: `GET /api/v1/graphql?query=query{vendors{id name}}`
+
 Status Code: 200
+
 ```json
 {
   "data": {
@@ -500,7 +505,9 @@ Status Code: 201
 **Unsuccessful Response**
 
 Mutation string does not start with `mutation`
+
 Status Code: 405
+
 ```json
 {
   "message": "Mutation body must start with 'mutation'!
@@ -508,7 +515,9 @@ Status Code: 405
 ```
 
 Query parameter is missing or an incorrect GraphQL query
+
 Status Code: 400
+
 ```json
 {
   "errors": [
