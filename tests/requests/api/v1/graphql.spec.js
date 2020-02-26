@@ -508,8 +508,20 @@ describe('Test The Market\'s Path', () => {
         });
       });
       describe('deleteMarketVendor', () => {
-        it.skip('should delete a market vendor', async () => {
+        it('should delete a market vendor', async () => {
+          let marketVendor = await database('market_vendors').select().first()
+          const url = `/api/v1/graphql`
+          let res = await request(app)
+          .post(url)
+          .send({ query: `mutation { deleteMarketVendor( id: ${marketVendor.id} )}`})
+          const selectedMarketVendor = await database('market_vendors').where('id', marketVendor.id).select()
 
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('deleteMarketVendor')
+          expect(res.body.data.deleteMarketVendor).toBe('Success!')
+          expect(selectedMarketVendor.length).toBe(0)
+          
         });
       });
       describe('addProduct', () => {
