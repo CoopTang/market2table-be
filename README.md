@@ -239,7 +239,9 @@ Status Code: 200
 ```
 
 Requesting single vendor:
+
 Query: `GET /api/v1/graphql?query=query{vendor(id: 1){id name}}`
+
 Status Code: 200
 ```json
 {
@@ -255,6 +257,7 @@ Status Code: 200
 **Unsuccessful Response**
 
 Query does not start with `query`
+
 Status Code: 405
 ```json
 {
@@ -263,6 +266,7 @@ Status Code: 405
 ```
 
 Query parameter is missing or an incorrect GraphQL query
+
 Status Code: 400
 ```json
 {
@@ -287,18 +291,18 @@ Status Code: 400
 This endpoint will return a JSON response with the data requested via GraphQL
 
 This endpoint requires a body with one of the following formats:
-```json
+```
 {
   "query": "
     mutation {
       addMarket(
-        id: <int>,
-        name: <string>,
-        address: <string>,
-        google_link: <string>,
-        schedule: <string>,
-        latitude: <float>,
-        longitude: <float>
+        id: <int>,              // required
+        name: <string>,         // required
+        address: <string>,      // required
+        google_link: <string>,  // required
+        schedule: <string>,     // required
+        latitude: <float>,      // required
+        longitude: <float>      // required
       ) {
         id
         name
@@ -324,10 +328,10 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       addVendor(
-        name: <string>,
-        description: <string>,
-        image_link: <string>,
-        product_id: <int>
+        name: <string>,        // required
+        description: <string>, // required
+        image_link: <string>,  // required
+        product_id: <int>      // required
       ) {
         id
         name
@@ -356,10 +360,10 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       addProduct(
-        name: <string>,
-        description: <string>,
-        price: <float>,
-        vendor_id: <int>
+        name: <string>,        // required
+        description: <string>, // required
+        price: <float>,        // required
+        vendor_id: <int>       // required
       ) {
         id
         name
@@ -388,8 +392,8 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       addMarketVendor(
-        market_id: <int>,
-        vendor_id: <int>
+        market_id: <int>, // required
+        vendor_id: <int>  // required
       ) {
         id
         market {
@@ -425,10 +429,10 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       updateVendor(
-        id: <vendor_id>,
-        name: <string>,
-        description: <string>,
-        image_link: <string>
+        id: <vendor_id>,        // required
+        name: <string>,         // optional
+        description: <string>,  // optional
+        image_link: <string>    // optional
       ) {
         id
         name
