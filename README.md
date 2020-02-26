@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/CoopTang/market2table-be.svg?branch=master)](https://travis-ci.com/CoopTang/market2table-be)
 # Market2Table
-A back-end API that exposes endpoints to search for farmers markets based on ZIP code as well as their vendor and product details. See it live on [Heroku](https://market2table.herokuapp.com/)
+A back-end API that exposes endpoints to search for farmers markets based on ZIP code as well as their vendor and product details. View the front end code on [GitHub](https://github.com/foster55f/market2table-fe) or see it live on [Heroku](https://market2table.herokuapp.com/)
 
 ![Imgur](https://i.imgur.com/4YfdpPO.png)
 
