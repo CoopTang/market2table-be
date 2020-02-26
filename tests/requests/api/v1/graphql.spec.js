@@ -489,13 +489,12 @@ describe('Test The Market\'s Path', () => {
           const url = `/api/v1/graphql`
           let res = await request(app)
           .post(url)
-          .send({ query: 'mutation { addVendor(id: 888, name: "Michael\'s Vendor", description: "Big Tomatoes", image_link: "n/a"){id name description image_link}}'})
+          .send({ query: 'mutation { addVendor(name: "Michael\'s Vendor", description: "Big Tomatoes", image_link: "n/a"){name description image_link}}'})
           const vendors = await database('vendors').select()
 
           expect(res.statusCode).toBe(201)
           expect(res.body).toHaveProperty('data')
-          expect(res.body.data.addVendor).toHaveProperty('id')
-          expect(res.body.data.addVendor.id).toBe("888")
+          expect(res.body.data).toHaveProperty('addVendor')
           expect(res.body.data.addVendor).toHaveProperty('name')
           expect(res.body.data.addVendor.name).toBe("Michael\'s Vendor")
           expect(res.body.data.addVendor).toHaveProperty('description')
