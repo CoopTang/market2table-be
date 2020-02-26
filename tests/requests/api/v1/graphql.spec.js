@@ -436,26 +436,117 @@ describe('Test The Market\'s Path', () => {
       expect(res.body.data.product.vendor).toHaveProperty('id')
     })
   })
-
   describe('GraphQL Query tests', () => {
-    it('should delete all products for a vendor', async () => {
-      const vendor = await database('vendors').select().first()
-      const queryString = `mutation{deleteAllVendorProducts(id: ${vendor.id})}`
-      let res = await request(app)
-        .post('/api/v1/graphql')
-        .send({
-          query: queryString
+    describe('MUTATIONS', () => {
+      describe('addMarkets', () => {
+        it('should return the information for the newly added market', async () => {
+          const url = `/api/v1/graphql`
+          let res = await request(app)
+          .post(url)
+          .send({ query: 'mutation { addMarket(id: 999, name: "Turing_Market", address: "143 Turing Cir", google_link: "n/a", schedule: "operates 24/7", latitude: 3.0, longitude: 4.0) {id name address google_link schedule latitude longitude}}'})
+          const markets = await database('markets').select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data.addMarket).toHaveProperty('id')
+          expect(res.body.data.addMarket.id).toBe("999")
+          expect(res.body.data.addMarket).toHaveProperty('name')
+          expect(res.body.data.addMarket.name).toBe("Turing_Market")
+          expect(res.body.data.addMarket).toHaveProperty('address')
+          expect(res.body.data.addMarket.address).toBe("143 Turing Cir")
+          expect(res.body.data.addMarket).toHaveProperty('google_link')
+          expect(res.body.data.addMarket.google_link).toBe("n/a")
+          expect(res.body.data.addMarket).toHaveProperty('schedule')
+          expect(res.body.data.addMarket.schedule).toBe("operates 24/7")
+          expect(res.body.data.addMarket).toHaveProperty('latitude')
+          expect(res.body.data.addMarket.latitude).toBe(3.0)
+          expect(res.body.data.addMarket).toHaveProperty('longitude')
+          expect(res.body.data.addMarket.longitude).toBe(4.0)
+          expect(markets.length).toBe(3)
         })
-      const vendor_products = await database('products').where('vendor_id', vendor.id).select()
-      const products = await database('products').select()
+      });
+      describe('deleteMarket', () => {
+        it('should delete the specified market', async () => {
+          const market = await database('markets').select().first()
+          const url = `/api/v1/graphql`
+          let res = await request(app)
+          .post(url)
+          .send({ query: `mutation { deleteMarket( id: ${market.id})}`})
 
-      expect(res.statusCode).toBe(201)
-      expect(res.body).toHaveProperty('data')
-      expect(res.body.data).toHaveProperty('deleteAllVendorProducts')
-      expect(res.body.data.deleteAllVendorProducts).toBe('Success!')
+          const selectedMarket = await database('markets').where('id', market.id).select()
 
-      expect(vendor_products.length).toBe(0)
-      expect(products.length).toBe(3)
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('deleteMarket')
+          expect(res.body.data.deleteMarket).toBe('Success!')
+
+          expect(selectedMarket.length).toBe(0)
+      
+        });
+      });
+      // describe('addMarketVendor', () => {
+      //   it.skip('should return the info for the newly added market vendor', async () => {
+      //     const url = `/api/v1/graphql`
+      //     let res = await request(app)
+      //     .post(url)
+      //     .send({ query: 'mutation { addMarketVendor( market_id: 4, vendor_id: 5) { market_id, vendor_id}}'})
+      //     const marketVendor = await database('market_vendors').select()
+
+      //     expect(res.statusCode).toBe(201)
+      //   });
+      // });
+      // describe('deleteMarketVendor', () => {
+      //   it.skip('should delete a market vendor', async () => {
+
+      //   });
+      // });
+      describe('addProduct', () => {
+        it.skip('should return the information for the newly added product', async () => {
+          const url = `/api/v1/graphql`
+          let res = await request(app)
+          .post(url)
+          .send({ query: 'mutation { addProduct(id: 901, name: "mochi", description: "rice cake", price: 99.99, vendor_id: 2) {id name description price vendor_id}}'})
+          const product = await database('products').select()
+
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data.addProduct).toHaveProperty('id')
+          expect(res.body.data.addProduct.id).toBe("901")
+          expect(res.body.data.addProduct).toHaveProperty('name')
+          expect(res.body.data.addProduct.name).toBe("mochi")
+          expect(res.body.data.addProduct).toHaveProperty('description')
+          expect(res.body.data.addProduct.description).toBe("rice cake")
+          expect(res.body.data.addProduct).toHaveProperty('price')
+          expect(res.body.data.addProduct.price).toBe(99.99)
+          expect(res.body.data.addProduct).toHaveProperty('vendor_id')
+          expect(res.body.data.addProduct.vendor_id).toBe(2)
+          expect(product.length).toBe(3)
+
+        })
+      })
+      describe('deleteAllVendorProducts', () => {
+        it('should delete all products for a vendor', async () => {
+          const vendor = await database('vendors').select().first()
+          const queryString = `mutation{deleteAllVendorProducts(id: ${vendor.id})}`
+          let res = await request(app)
+            .post('/api/v1/graphql')
+            .send({
+              query: queryString
+            })
+          const vendor_products = await database('products').where('vendor_id', vendor.id).select()
+          const products = await database('products').select()
+    
+          expect(res.statusCode).toBe(201)
+          expect(res.body).toHaveProperty('data')
+          expect(res.body.data).toHaveProperty('deleteAllVendorProducts')
+          expect(res.body.data.deleteAllVendorProducts).toBe('Success!')
+    
+          expect(vendor_products.length).toBe(0)
+          expect(products.length).toBe(3)
+        });
+      });
+      
+
     })
   })
 })
