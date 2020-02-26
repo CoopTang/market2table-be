@@ -1,5 +1,7 @@
 # Market2Table
-A back-end API that exposes endpoints to search for farmers markets based on ZIP code as well as their vendor and product details.
+A back-end API that exposes endpoints to search for farmers markets based on ZIP code as well as their vendor and product details. See it live on [Heroku](https://market2table.herokuapp.com/)
+
+![Imgur](https://i.imgur.com/4YfdpPO.png)
 
 ## Tech/framework used
 <b>Built with</b>
@@ -389,8 +391,14 @@ This endpoint requires a body with one of the following formats:
         vendor_id: <int>
       ) {
         id
-        market
-        vendor
+        market {
+          id
+          ...
+        }
+        vendor {
+          id
+          ...
+        }
       }
     }
   "
@@ -408,6 +416,32 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       deleteAllVendorProducts(id: <vendor_id>)
+    }
+  "
+}
+
+{
+  "query": "
+    mutation {
+      updateVendor(
+        id: <vendor_id>,
+        name: <string>,
+        description: <string>,
+        image_link: <string>
+      ) {
+        id
+        name
+        description
+        image_link
+        market {
+          id
+          ...
+        }
+        products {
+          id
+          ...
+        }
+      }
     }
   "
 }
