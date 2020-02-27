@@ -1,5 +1,8 @@
+[![Build Status](https://travis-ci.com/CoopTang/market2table-be.svg?branch=master)](https://travis-ci.com/CoopTang/market2table-be)
 # Market2Table
-A back-end API that exposes endpoints to search for farmers markets based on ZIP code as well as their vendor and product details.
+A back-end API that exposes endpoints to search for farmers markets based on ZIP code as well as their vendor and product details. View the front end code on [GitHub](https://github.com/foster55f/market2table-fe) or see it live on [Heroku](https://market2table.herokuapp.com/)
+
+![Imgur](https://i.imgur.com/4YfdpPO.png)
 
 ## Tech/framework used
 <b>Built with</b>
@@ -73,6 +76,7 @@ Status 200
 
 **Unsuccessful response**
 If the zip code is the proper format, but there is no zip code with the given zip
+
 Status code 404
 ```
 {
@@ -82,6 +86,7 @@ Status code 404
 
 
 If the zip code is formatted incorrectly (i.e. not five numbers or has non-numeric character)
+
 Status code 400
 ```
 {
@@ -215,8 +220,11 @@ Each of the fields can be omitted if you do not want those fields in the respons
 **Successful Response**
 
 Requesting multiple vendors:
+
 Query: `GET /api/v1/graphql?query=query{vendors{id name}}`
+
 Status Code: 200
+
 ```json
 {
   "data": {
@@ -236,7 +244,9 @@ Status Code: 200
 ```
 
 Requesting single vendor:
+
 Query: `GET /api/v1/graphql?query=query{vendor(id: 1){id name}}`
+
 Status Code: 200
 ```json
 {
@@ -252,6 +262,7 @@ Status Code: 200
 **Unsuccessful Response**
 
 Query does not start with `query`
+
 Status Code: 405
 ```json
 {
@@ -260,6 +271,7 @@ Status Code: 405
 ```
 
 Query parameter is missing or an incorrect GraphQL query
+
 Status Code: 400
 ```json
 {
@@ -284,18 +296,18 @@ Status Code: 400
 This endpoint will return a JSON response with the data requested via GraphQL
 
 This endpoint requires a body with one of the following formats:
-```json
+```
 {
   "query": "
     mutation {
       addMarket(
-        id: <int>,
-        name: <string>,
-        address: <string>,
-        google_link: <string>,
-        schedule: <string>,
-        latitude: <float>,
-        longitude: <float>
+        id: <int>,              // required
+        name: <string>,         // required
+        address: <string>,      // required
+        google_link: <string>,  // required
+        schedule: <string>,     // required
+        latitude: <float>,      // required
+        longitude: <float>      // required
       ) {
         id
         name
@@ -321,10 +333,10 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       addVendor(
-        name: <string>,
-        description: <string>,
-        image_link: <string>,
-        product_id: <int>
+        name: <string>,        // required
+        description: <string>, // required
+        image_link: <string>,  // required
+        product_id: <int>      // required
       ) {
         id
         name
@@ -353,10 +365,10 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       addProduct(
-        name: <string>,
-        description: <string>,
-        price: <float>,
-        vendor_id: <int>
+        name: <string>,        // required
+        description: <string>, // required
+        price: <float>,        // required
+        vendor_id: <int>       // required
       ) {
         id
         name
@@ -385,12 +397,18 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       addMarketVendor(
-        market_id: <int>,
-        vendor_id: <int>
+        market_id: <int>, // required
+        vendor_id: <int>  // required
       ) {
         id
-        market
-        vendor
+        market {
+          id
+          ...
+        }
+        vendor {
+          id
+          ...
+        }
       }
     }
   "
@@ -408,6 +426,32 @@ This endpoint requires a body with one of the following formats:
   "query": "
     mutation {
       deleteAllVendorProducts(id: <vendor_id>)
+    }
+  "
+}
+
+{
+  "query": "
+    mutation {
+      updateVendor(
+        id: <vendor_id>,        // required
+        name: <string>,         // optional
+        description: <string>,  // optional
+        image_link: <string>    // optional
+      ) {
+        id
+        name
+        description
+        image_link
+        market {
+          id
+          ...
+        }
+        products {
+          id
+          ...
+        }
+      }
     }
   "
 }
@@ -461,7 +505,9 @@ Status Code: 201
 **Unsuccessful Response**
 
 Mutation string does not start with `mutation`
+
 Status Code: 405
+
 ```json
 {
   "message": "Mutation body must start with 'mutation'!
@@ -469,7 +515,9 @@ Status Code: 405
 ```
 
 Query parameter is missing or an incorrect GraphQL query
+
 Status Code: 400
+
 ```json
 {
   "errors": [
